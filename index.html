@@ -481,7 +481,7 @@
     /* ============================================================
       PORTFOLIO / WORK
     ============================================================ */
-    .work { padding: var(--sp-16) 0; background: var(--iron); }
+    .work { padding: var(--sp-16) 0; background: #000000; position: relative; overflow: hidden; }
     .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-1); }
     .work-item {
       position: relative; overflow: hidden;
@@ -550,7 +550,7 @@
     /* ============================================================
       NICHES
     ============================================================ */
-    .niches { padding: var(--sp-16) 0; background: var(--iron); }
+    .niches { padding: var(--sp-16) 0; background: #000000; position: relative; overflow: hidden; }
     .niches-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-1); }
     .niche-card { position: relative; overflow: hidden; aspect-ratio: 2/3; background: var(--charcoal); }
     .niche-bg { position: absolute; inset: 0; transition: transform 0.5s ease; }
@@ -905,6 +905,21 @@
       flex-direction: column;
     }
 
+    /* ============================================================
+      SECTION PARTICLES BACKGROUND (work + niches)
+    ============================================================ */
+    .section-particles-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .work > .container,
+    .niches > .container {
+      position: relative;
+      z-index: 1;
+    }
+
   </style>
 </head>
 <body>
@@ -1209,7 +1224,7 @@
                  onerror="this.parentElement.style.background='#181818'" />
           </div>
           <div class="niche-content">
-            <span class="niche-icon">🔥</span>
+            <span class="niche-icon"> </span>
             <h3 class="niche-title">VICES</h3>
             <p class="niche-desc">Tobacco, spirits, lifestyle brands — seductive, rebellious, and unapologetically bold visuals.</p>
           </div>
@@ -1221,7 +1236,7 @@
                  onerror="this.parentElement.style.background='#181818'" />
           </div>
           <div class="niche-content">
-            <span class="niche-icon">⚡</span>
+            <span class="niche-icon"> </span>
             <h3 class="niche-title">EXTREME SPORTS</h3>
             <p class="niche-desc">Skateboarding, BMX, MMA, surfing, motocross — the adrenaline is built into every design.</p>
           </div>
@@ -1233,7 +1248,7 @@
                  onerror="this.parentElement.style.background='#181818'" />
           </div>
           <div class="niche-content">
-            <span class="niche-icon">🛒</span>
+            <span class="niche-icon"> </span>
             <h3 class="niche-title">ECOMMERCE</h3>
             <p class="niche-desc">Product visuals, brand systems, and packaging design that converts — great design sells.</p>
           </div>
@@ -1245,7 +1260,7 @@
                  onerror="this.parentElement.style.background='#181818'" />
           </div>
           <div class="niche-content">
-            <span class="niche-icon">🎭</span>
+            <span class="niche-icon"> </span>
             <h3 class="niche-title">ARTISTS</h3>
             <p class="niche-desc">Musicians, visual artists, photographers — we build brands around your art so your audience gets it.</p>
           </div>
@@ -1303,12 +1318,11 @@
           WILD.
         </h2>
         <p class="contact-sub">Ready to start a project? Tell us what you're building and let's make it happen. No idea is too bold.</p>
-        <a href="mailto:hello@mudpixel.com" class="contact-email">hello@mudpixel.com</a>
+        <a href="mailto:mud@mudpixel.com" class="contact-email">hello@mudpixel.com</a>
         <div class="contact-socials">
-          <a href="https://instagram.com/YOUR_HANDLE" class="social-link" target="_blank" rel="noopener">Instagram ↗</a>
-          <a href="https://behance.net/YOUR_HANDLE" class="social-link" target="_blank" rel="noopener">Behance ↗</a>
-          <a href="https://facebook.com/YOUR_PAGE" class="social-link" target="_blank" rel="noopener">Facebook ↗</a>
-          <a href="https://tiktok.com/@YOUR_HANDLE" class="social-link" target="_blank" rel="noopener">TikTok ↗</a>
+          <a href="https://www.linkedin.com/in/sherwin-martin/" class="social-link" target="_blank" rel="noopener">Linkedin ↗</a>
+                   <a href="https://www.facebook.com/mudspit" class="social-link" target="_blank" rel="noopener">Facebook ↗</a>
+          <a href="https://x.com/Mudspitx" class="social-link" target="_blank" rel="noopener">X ↗</a>
         </div>
       </div>
 
@@ -2202,6 +2216,277 @@
       })();
 
     })();
+
+    // ============================================================
+    //  SECTION PARTICLES  (vanilla WebGL port of React Bits Particles)
+    // ============================================================
+    (function initParticles() {
+      function hexToRgb(hex) {
+        hex = hex.replace(/^#/, '');
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        const n = parseInt(hex, 16);
+        return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+      }
+
+      const VERT = `
+        attribute vec3 position;
+        attribute vec4 random;
+        attribute vec3 color;
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 projectionMatrix;
+        uniform float uTime;
+        uniform float uSpread;
+        uniform float uBaseSize;
+        uniform float uSizeRandomness;
+        varying vec4 vRandom;
+        varying vec3 vColor;
+        void main() {
+          vRandom = random;
+          vColor  = color;
+          vec3 pos = position * uSpread;
+          pos.z *= 10.0;
+          vec4 mPos = modelMatrix * vec4(pos, 1.0);
+          float t = uTime;
+          mPos.x += sin(t * random.z + 6.28 * random.w) * mix(0.1, 1.5, random.x);
+          mPos.y += sin(t * random.y + 6.28 * random.x) * mix(0.1, 1.5, random.w);
+          mPos.z += sin(t * random.w + 6.28 * random.y) * mix(0.1, 1.5, random.z);
+          vec4 mvPos = viewMatrix * mPos;
+          gl_PointSize = (uSizeRandomness == 0.0)
+            ? uBaseSize
+            : (uBaseSize * (1.0 + uSizeRandomness * (random.x - 0.5))) / length(mvPos.xyz);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `;
+
+      const FRAG = `
+        precision highp float;
+        uniform float uTime;
+        uniform float uAlphaParticles;
+        varying vec4 vRandom;
+        varying vec3 vColor;
+        void main() {
+          vec2 uv = gl_PointCoord.xy;
+          float d  = length(uv - vec2(0.5));
+          if (uAlphaParticles < 0.5) {
+            if (d > 0.5) discard;
+            gl_FragColor = vec4(vColor + 0.2 * sin(uv.yxx + uTime + vRandom.y * 6.28), 1.0);
+          } else {
+            float circle = smoothstep(0.5, 0.4, d) * 0.8;
+            gl_FragColor = vec4(vColor + 0.2 * sin(uv.yxx + uTime + vRandom.y * 6.28), circle);
+          }
+        }
+      `;
+
+      // Column-major perspective matrix (same convention as ogl Camera)
+      function buildProj(fovDeg, aspect, near, far) {
+        const f  = 1.0 / Math.tan(fovDeg * Math.PI / 360);
+        const nf = 1  / (near - far);
+        return new Float32Array([
+          f / aspect, 0, 0,               0,
+          0,          f, 0,               0,
+          0,          0, (far + near)*nf, -1,
+          0,          0, 2*far*near*nf,    0
+        ]);
+      }
+
+      // Column-major model matrix: ZYX Euler rotation + XY translation
+      function buildModel(px, py, rx, ry, rz) {
+        const cx = Math.cos(rx), sx = Math.sin(rx);
+        const cy = Math.cos(ry), sy = Math.sin(ry);
+        const cz = Math.cos(rz), sz = Math.sin(rz);
+        return new Float32Array([
+          cy*cz,              cy*sz,              -sy,    0,
+          cz*sy*sx - sz*cx,   sz*sy*sx + cz*cx,   cy*sx,  0,
+          cz*sy*cx + sz*sx,   sz*sy*cx - cz*sx,   cy*cx,  0,
+          px,                 py,                 0,       1
+        ]);
+      }
+
+      function mountParticles(container, opts) {
+        const {
+          particleCount        = 200,
+          particleSpread       = 10,
+          speed                = 0.1,
+          particleColors       = ['#ffffff'],
+          moveParticlesOnHover = false,
+          particleHoverFactor  = 1,
+          alphaParticles       = false,
+          particleBaseSize     = 100,
+          sizeRandomness       = 1,
+          cameraDistance       = 20,
+          disableRotation      = false,
+          pixelRatio           = 1
+        } = opts;
+
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'display:block;width:100%;height:100%;';
+        container.appendChild(canvas);
+
+        const gl = canvas.getContext('webgl', { alpha: true, depth: false, antialias: false })
+                || canvas.getContext('experimental-webgl', { alpha: true, depth: false });
+        if (!gl) { canvas.remove(); return null; }
+
+        gl.clearColor(0, 0, 0, 0);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        function makeShader(type, src) {
+          const s = gl.createShader(type);
+          gl.shaderSource(s, src);
+          gl.compileShader(s);
+          return s;
+        }
+        const prog = gl.createProgram();
+        gl.attachShader(prog, makeShader(gl.VERTEX_SHADER,   VERT));
+        gl.attachShader(prog, makeShader(gl.FRAGMENT_SHADER, FRAG));
+        gl.linkProgram(prog);
+        gl.useProgram(prog);
+
+        const aPos = gl.getAttribLocation(prog,  'position');
+        const aRnd = gl.getAttribLocation(prog,  'random');
+        const aCol = gl.getAttribLocation(prog,  'color');
+        const uMdl = gl.getUniformLocation(prog, 'modelMatrix');
+        const uVw  = gl.getUniformLocation(prog, 'viewMatrix');
+        const uPrj = gl.getUniformLocation(prog, 'projectionMatrix');
+        const uT   = gl.getUniformLocation(prog, 'uTime');
+        const uSpd = gl.getUniformLocation(prog, 'uSpread');
+        const uBsz = gl.getUniformLocation(prog, 'uBaseSize');
+        const uSzR = gl.getUniformLocation(prog, 'uSizeRandomness');
+        const uAlp = gl.getUniformLocation(prog, 'uAlphaParticles');
+
+        // build geometry
+        const cnt = particleCount;
+        const posArr = new Float32Array(cnt * 3);
+        const rndArr = new Float32Array(cnt * 4);
+        const colArr = new Float32Array(cnt * 3);
+        const pal = (particleColors && particleColors.length) ? particleColors : ['#ffffff'];
+        for (let i = 0; i < cnt; i++) {
+          let x, y, z, l;
+          do {
+            x = Math.random()*2 - 1; y = Math.random()*2 - 1; z = Math.random()*2 - 1;
+            l = x*x + y*y + z*z;
+          } while (l > 1 || l === 0);
+          const r = Math.cbrt(Math.random());
+          posArr.set([x*r, y*r, z*r], i * 3);
+          rndArr.set([Math.random(), Math.random(), Math.random(), Math.random()], i * 4);
+          colArr.set(hexToRgb(pal[Math.floor(Math.random() * pal.length)]), i * 3);
+        }
+
+        function upload(data, attr, size) {
+          const b = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, b);
+          gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+          gl.enableVertexAttribArray(attr);
+          gl.vertexAttribPointer(attr, size, gl.FLOAT, false, 0, 0);
+        }
+        upload(posArr, aPos, 3);
+        upload(rndArr, aRnd, 4);
+        upload(colArr, aCol, 3);
+
+        gl.uniform1f(uSpd, particleSpread);
+        gl.uniform1f(uBsz, particleBaseSize * pixelRatio);
+        gl.uniform1f(uSzR, sizeRandomness);
+        gl.uniform1f(uAlp, alphaParticles ? 1.0 : 0.0);
+
+        // view matrix: camera at (0, 0, cameraDistance) looking at origin
+        gl.uniformMatrix4fv(uVw, false, new Float32Array([
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, -cameraDistance, 1
+        ]));
+
+        function onResize() {
+          const w = container.clientWidth  || 1;
+          const h = container.clientHeight || 1;
+          canvas.width  = Math.round(w * pixelRatio);
+          canvas.height = Math.round(h * pixelRatio);
+          gl.viewport(0, 0, canvas.width, canvas.height);
+          gl.useProgram(prog);
+          gl.uniformMatrix4fv(uPrj, false, buildProj(15, canvas.width / canvas.height, 0.1, 1000));
+        }
+        const ro = new ResizeObserver(onResize);
+        ro.observe(container);
+        onResize();
+
+        let mx = 0, my = 0;
+        if (moveParticlesOnHover) {
+          container.addEventListener('mousemove', e => {
+            const rect = container.getBoundingClientRect();
+            mx = ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+            my = -(((e.clientY - rect.top)  / rect.height) * 2 - 1);
+          });
+        }
+
+        let rx_ = 0, ry_ = 0, rz_ = 0;
+        let lastT = 0, elapsed = 0;
+        let raf = null, dead = false, running = false;
+
+        function frame(t) {
+          if (dead || !running) { raf = null; return; }
+          raf = requestAnimationFrame(frame);
+          if (lastT === 0) lastT = t;
+          const dt = t - lastT;
+          lastT = t;
+          elapsed += dt * speed;
+
+          const px_ = moveParticlesOnHover ? -mx * particleHoverFactor : 0;
+          const py_ = moveParticlesOnHover ? -my * particleHoverFactor : 0;
+          if (!disableRotation) {
+            rx_ = Math.sin(elapsed * 0.0002) * 0.1;
+            ry_ = Math.cos(elapsed * 0.0005) * 0.15;
+            rz_ += 0.01 * speed;
+          }
+
+          gl.useProgram(prog);
+          gl.uniform1f(uT, elapsed * 0.001);
+          gl.uniformMatrix4fv(uMdl, false, buildModel(px_, py_, rx_, ry_, rz_));
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.drawArrays(gl.POINTS, 0, cnt);
+        }
+
+        // pause RAF when section is off-screen
+        const io = new IntersectionObserver(([e]) => {
+          running = e.isIntersecting;
+          if (running && !raf) {
+            lastT = 0;
+            raf = requestAnimationFrame(frame);
+          }
+        }, { threshold: 0 });
+        io.observe(container);
+
+        return {
+          destroy() {
+            dead = true;
+            if (raf) cancelAnimationFrame(raf);
+            ro.disconnect();
+            io.disconnect();
+            canvas.remove();
+          }
+        };
+      }
+
+      document.querySelectorAll('.work, .niches').forEach(section => {
+        const bg = document.createElement('div');
+        bg.className = 'section-particles-bg';
+        section.prepend(bg);
+        mountParticles(bg, {
+          particleCount:        200,
+          particleSpread:       10,
+          speed:                0.1,
+          particleColors:       ['#FFC000', '#ffffff', '#29ABE2'],
+          moveParticlesOnHover: false,
+          alphaParticles:       true,
+          particleBaseSize:     100,
+          sizeRandomness:       1,
+          cameraDistance:       20,
+          disableRotation:      false,
+          pixelRatio:           Math.min(window.devicePixelRatio || 1, 2)
+        });
+      });
+    })();
+
   </script>
 
 </body>
