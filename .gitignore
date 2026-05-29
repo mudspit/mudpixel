@@ -1,0 +1,13 @@
+# Backup files
+index - Copy*.html
+index-bu.html
+
+# Assets not in use
+download.png
+team.png
+team.webp
+
+# Archives & recordings
+*.zip
+*.mp4
+converticon*/
