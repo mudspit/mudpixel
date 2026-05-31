@@ -492,6 +492,49 @@
     @media (hover: hover) and (pointer: fine) {
       .work-item:hover .work-image { transform: scale(1.04); }
     }
+    /* --- featured video embed --- */
+    .work-video-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+    .work-video-wrap iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      /* overshoot to cover 21:9 container with 16:9 video + hide YT chrome */
+      width: 130%;
+      height: 130%;
+      transform: translate(-50%, -50%);
+      border: none;
+      pointer-events: none;
+    }
+    .work-mute-btn {
+      position: absolute;
+      bottom: 18px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.65);
+      border: 1px solid rgba(255,255,255,0.28);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .work-mute-btn:hover {
+      background: rgba(255,192,0,0.2);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .work-mute-btn svg { width: 17px; height: 17px; display: block; }
     .work-overlay {
       position: absolute; inset: 0;
       background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 60%);
@@ -550,7 +593,7 @@
     /* ============================================================
       NICHES
     ============================================================ */
-    .niches { padding: var(--sp-16) 0; background: #000000; position: relative; overflow: hidden; }
+    .niches { padding: var(--sp-16) 0 var(--sp-10); background: #000000; position: relative; overflow: hidden; }
     .niches-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-1); }
     .niche-card { position: relative; overflow: hidden; aspect-ratio: 2/3; background: var(--charcoal); }
     .niche-bg { position: absolute; inset: 0; transition: transform 0.5s ease; }
@@ -607,7 +650,7 @@
       CONTACT
     ============================================================ */
     .contact { padding: var(--sp-16) 0; background: var(--charcoal); }
-    .contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-10); align-items: start; }
+    .contact-inner { display: grid; grid-template-columns: 1fr; max-width: 640px; gap: var(--sp-6); }
     .contact-headline {
       font-family: var(--font-display); font-size: clamp(56px, 7vw, 96px);
       line-height: 0.95; color: var(--white); margin: var(--sp-2) 0 var(--sp-4);
@@ -690,7 +733,6 @@
       .work-item--featured { grid-column: span 1; aspect-ratio: 16/9; }
       .niches-grid { grid-template-columns: repeat(2, 1fr); }
       .niche-desc { opacity: 1; transform: none; }
-      .contact-inner { grid-template-columns: 1fr; gap: var(--sp-6); }
       .contact-headline { font-size: clamp(48px, 14vw, 80px); }
       .footer-inner { grid-template-columns: 1fr; gap: var(--sp-6); padding: var(--sp-8) 24px; }
       .footer-nav { grid-template-columns: repeat(3, 1fr); }
@@ -903,6 +945,189 @@
       z-index: 1;
       display: flex;
       flex-direction: column;
+    }
+
+    /* ============================================================
+      ORBITAL TIMELINE  (niches section)
+    ============================================================ */
+    .orbital-timeline {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: var(--sp-6);
+    }
+    .orbital-track {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.07);
+      pointer-events: none;
+      transition: width 0.3s, height 0.3s;
+    }
+    /* --- center orb --- */
+    .orbital-center {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--gold), var(--cyan), var(--gold));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      cursor: default;
+      animation: orb-breathe 2.2s ease-in-out infinite;
+    }
+    .orbital-ring {
+      position: absolute;
+      border-radius: 50%;
+      animation: orb-ping 1.6s cubic-bezier(0,0,0.2,1) infinite;
+    }
+    .orbital-ring--1 { width: 76px;  height: 76px;  border: 1px solid rgba(255,255,255,0.22); }
+    .orbital-ring--2 { width: 94px;  height: 94px;  border: 1px solid rgba(255,255,255,0.10); animation-delay: 0.65s; }
+    .orbital-core {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.88);
+    }
+    @keyframes orb-ping    { 0% { transform: scale(1); opacity:.7; } 100% { transform: scale(1.65); opacity:0; } }
+    @keyframes orb-breathe {
+      0%,100% { box-shadow: 0 0 18px rgba(255,192,0,.35), 0 0 38px rgba(41,171,226,.14); }
+      50%      { box-shadow: 0 0 32px rgba(255,192,0,.55), 0 0 65px rgba(41,171,226,.26); }
+    }
+    /* --- orbit nodes --- */
+    .orbital-node {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      transition: opacity 0.7s ease;
+      will-change: transform, opacity;
+    }
+    .orbital-node-energy {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,192,0,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .orbital-node--pulsing .orbital-node-energy {
+      background: radial-gradient(circle, rgba(255,192,0,.28) 0%, transparent 70%);
+      animation: orb-breathe 1.3s ease-in-out infinite;
+    }
+    .orbital-node-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.32);
+      background: rgba(0,0,0,.85);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      position: relative; z-index: 1;
+    }
+    .orbital-node--active .orbital-node-btn {
+      background: var(--gold);
+      border-color: var(--gold);
+      transform: scale(1.45);
+      box-shadow: 0 0 22px rgba(255,192,0,.55);
+    }
+    .orbital-node--related .orbital-node-btn {
+      background: rgba(255,255,255,.14);
+      border-color: rgba(255,255,255,.75);
+    }
+    .orbital-node-label {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+    .orbital-node--active .orbital-node-label { color: var(--gold); letter-spacing: .22em; }
+    /* --- popup card --- */
+    .orbital-card {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 232px;
+      background: rgba(6,6,10,.97);
+      border: 1px solid rgba(255,192,0,.22);
+      box-shadow: 0 24px 64px rgba(0,0,0,.92), 0 0 22px rgba(255,192,0,.07);
+      backdrop-filter: blur(18px);
+      z-index: 300;
+    }
+    .orbital-card-line {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 14px;
+      background: rgba(255,192,0,.38);
+    }
+    .orbital-card-content { padding: 14px 16px 16px; }
+    .orbital-card-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: .06em;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .orbital-card-desc {
+      font-size: 12px;
+      color: rgba(255,255,255,.76);
+      line-height: 1.75;
+      margin-bottom: 14px;
+    }
+    .orbital-card-energy { border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px; margin-bottom: 12px; }
+    .orbital-card-energy-label {
+      display: flex; justify-content: space-between;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: .13em; text-transform: uppercase;
+      color: rgba(255,255,255,.4); margin-bottom: 6px;
+    }
+    .orbital-card-energy-bar {
+      width: 100%; height: 2px;
+      background: rgba(255,255,255,.08);
+      border-radius: 1px; overflow: hidden;
+    }
+    .orbital-card-energy-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--cyan)); }
+    .orbital-card-related { border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px; }
+    .orbital-card-related-label {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: rgba(255,255,255,.35); margin-bottom: 8px;
+    }
+    .orbital-card-related-btns { display: flex; flex-wrap: wrap; gap: 5px; }
+    .orbital-card-related-btn {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(255,255,255,.72);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.18);
+      padding: 4px 9px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .orbital-card-related-btn:hover {
+      background: rgba(255,192,0,.12);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    @media (max-width: 768px) {
+      .orbital-timeline { height: 420px; }
+      .orbital-card { width: 200px; font-size: 11px; }
     }
 
     /* ============================================================
@@ -1135,9 +1360,26 @@
       <div class="work-grid">
 
         <div class="work-item work-item--featured">
-          <div class="work-image">
-            <img src="/images/work-1.jpg" alt="Featured project"
-                 onerror="this.parentElement.style.background='#202020'" />
+          <div class="work-video-wrap">
+            <iframe id="featured-yt"
+                    src="https://www.youtube.com/embed/obyfA223dHA?autoplay=1&mute=1&loop=1&playlist=obyfA223dHA&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1"
+                    frameborder="0"
+                    allow="autoplay; encrypted-media; fullscreen"
+                    allowfullscreen></iframe>
+            <button class="work-mute-btn" id="work-mute-btn" title="Toggle sound" aria-label="Toggle mute">
+              <!-- muted icon -->
+              <svg class="mute-icon mute-icon--off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <line x1="23" y1="9" x2="17" y2="15"></line>
+                <line x1="17" y1="9" x2="23" y2="15"></line>
+              </svg>
+              <!-- unmuted icon -->
+              <svg class="mute-icon mute-icon--on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+              </svg>
+            </button>
           </div>
      
 
@@ -1150,10 +1392,9 @@
 
       
       <div class="work-footer">
-        <button class="hero-enter-btn"
-                onclick="document.getElementById('ticker-bar').scrollIntoView({ behavior: 'smooth' })">
+        <a href="mudpixel-catalogue.pdf" target="_blank" rel="noopener" class="hero-enter-btn">
           Check Our Design Catalogue
-        </button>
+        </a>
       </div>
     </div>
   </section>
@@ -1216,57 +1457,7 @@
         <h2 class="section-headline">WE SPEAK YOUR LANGUAGE.</h2>
         <p class="section-sub">We're built for industries that live on the edge — where conventional design is a death sentence.</p>
       </div>
-      <div class="niches-grid">
-
-        <div class="niche-card">
-          <div class="niche-bg">
-            <img src="/images/niche-vices.jpg" alt="Vices"
-                 onerror="this.parentElement.style.background='#181818'" />
-          </div>
-          <div class="niche-content">
-            <span class="niche-icon"> </span>
-            <h3 class="niche-title">VICES</h3>
-            <p class="niche-desc">Tobacco, spirits, lifestyle brands — seductive, rebellious, and unapologetically bold visuals.</p>
-          </div>
-        </div>
-
-        <div class="niche-card">
-          <div class="niche-bg">
-            <img src="/images/niche-extreme.jpg" alt="Extreme Sports"
-                 onerror="this.parentElement.style.background='#181818'" />
-          </div>
-          <div class="niche-content">
-            <span class="niche-icon"> </span>
-            <h3 class="niche-title">EXTREME SPORTS</h3>
-            <p class="niche-desc">Skateboarding, BMX, MMA, surfing, motocross — the adrenaline is built into every design.</p>
-          </div>
-        </div>
-
-        <div class="niche-card">
-          <div class="niche-bg">
-            <img src="/images/niche-ecom.jpg" alt="Ecommerce"
-                 onerror="this.parentElement.style.background='#181818'" />
-          </div>
-          <div class="niche-content">
-            <span class="niche-icon"> </span>
-            <h3 class="niche-title">ECOMMERCE</h3>
-            <p class="niche-desc">Product visuals, brand systems, and packaging design that converts — great design sells.</p>
-          </div>
-        </div>
-
-        <div class="niche-card">
-          <div class="niche-bg">
-            <img src="/images/niche-artists.jpg" alt="Artists"
-                 onerror="this.parentElement.style.background='#181818'" />
-          </div>
-          <div class="niche-content">
-            <span class="niche-icon"> </span>
-            <h3 class="niche-title">ARTISTS</h3>
-            <p class="niche-desc">Musicians, visual artists, photographers — we build brands around your art so your audience gets it.</p>
-          </div>
-        </div>
-
-      </div>
+      <div class="orbital-timeline" id="niches-orbital"></div>
     </div>
   </section>
 
@@ -1318,47 +1509,19 @@
           WILD.
         </h2>
         <p class="contact-sub">Ready to start a project? Tell us what you're building and let's make it happen. No idea is too bold.</p>
-        <a href="mailto:mud@mudpixel.com" class="contact-email">hello@mudpixel.com</a>
+        <a href="mailto:mud@mudpixel.com" class="contact-email">mud@mudpixel.com</a>
         <div class="contact-socials">
           <a href="https://www.linkedin.com/in/sherwin-martin/" class="social-link" target="_blank" rel="noopener">Linkedin ↗</a>
-                   <a href="https://www.facebook.com/mudspit" class="social-link" target="_blank" rel="noopener">Facebook ↗</a>
+          <a href="https://www.facebook.com/mudspit" class="social-link" target="_blank" rel="noopener">Facebook ↗</a>
           <a href="https://x.com/Mudspitx" class="social-link" target="_blank" rel="noopener">X ↗</a>
         </div>
+        <a href="https://share-na2.hsforms.com/1bjC7fUB7SPikYgq4i5f4Kgsp9pr"
+           target="_blank" rel="noopener"
+           class="hero-enter-btn"
+           style="display:inline-block;margin-top:var(--sp-6);">
+          START A PROJECT →
+        </a>
       </div>
-
-      <form class="contact-form" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
-        <div class="form-group">
-          <label for="name">Your Name</label>
-          <input type="text" id="name" name="name" placeholder="What do we call you?" required />
-        </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="your@email.com" required />
-        </div>
-        <div class="form-group">
-          <label for="service">Service Needed</label>
-          <select id="service" name="service" required>
-            <option value="" disabled selected>Select a service</option>
-            <option value="illustration">Custom Digital Illustration</option>
-            <option value="painting">Digital Painting</option>
-            <option value="3d">3D Design &amp; Visualization</option>
-            <option value="social">Social Media Design</option>
-            <option value="ai">AI Content Creation</option>
-            <option value="branding">Visual Branding</option>
-            <option value="animation-2d3d">2D &amp; 3D Animation</option>
-            <option value="video">Video Animation</option>
-            <option value="strategy">Brand Strategy</option>
-            <option value="other">Something Else</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="message">Tell Us About Your Project</label>
-          <textarea id="message" name="message" rows="5" placeholder="The crazier the idea, the more we're into it..." required></textarea>
-        </div>
-        <button type="submit" class="btn-gold" style="width:100%; font-size:14px; letter-spacing:0.2em;">
-          SEND IT →
-        </button>
-      </form>
 
     </div>
   </section>
@@ -1397,12 +1560,11 @@
         </div>
         <div class="footer-col">
           <h4 class="footer-col-title">Follow</h4>
-          <ul>
-            <li><a href="https://instagram.com/YOUR_HANDLE" target="_blank">Instagram</a></li>
-            <li><a href="https://behance.net/YOUR_HANDLE" target="_blank">Behance</a></li>
-            <li><a href="https://facebook.com/YOUR_PAGE" target="_blank">Facebook</a></li>
-            <li><a href="https://tiktok.com/@YOUR_HANDLE" target="_blank">TikTok</a></li>
-          </ul>
+        <div class="contact-socials">
+          <a href="https://www.linkedin.com/in/sherwin-martin/" class="social-link" target="_blank" rel="noopener">Linkedin ↗</a>
+          <a href="https://www.facebook.com/mudspit" class="social-link" target="_blank" rel="noopener">Facebook ↗</a>
+          <a href="https://x.com/Mudspitx" class="social-link" target="_blank" rel="noopener">X ↗</a>
+        </div>
         </div>
       </div>
 
@@ -1523,19 +1685,45 @@
           void main() {
             vec4 texColor = texture2D(tDiffuse, vUv);
             if (texColor.a < 0.05) discard;
-            float traceEdge  = smoothstep(uTraceProgress - 0.1, uTraceProgress, vUv.x);
-            float sweepWidth = 0.15;
+
+            // --- pixelated reveal grid ---
+            float gridW    = 40.0;
+            float gridH    = 32.0;
+            vec2  cell     = floor(vec2(vUv.x * gridW, vUv.y * gridH));
+            float h1       = fract(sin(dot(cell, vec2(127.1, 311.7))) * 43758.5453);
+            float h2       = fract(sin(dot(cell, vec2(269.5, 183.3))) * 43758.5453);
+            float h3       = fract(sin(dot(cell, vec2(419.2, 371.9))) * 43758.5453);
+
+            // each cell gets a slightly staggered reveal threshold
+            float cellThresh = vUv.x + (h1 - 0.5) * 0.14;
+            float cellAlpha  = step(cellThresh, uTraceProgress);
+
+            // sparkle: brightest right at the cell's flip moment
+            float onEdge    = smoothstep(0.07, 0.0, abs(cellThresh - uTraceProgress));
+            float flicker   = step(0.38, fract(h2 * 9.7 + uTime * 14.0));
+            float sparkle   = onEdge * flicker;
+
+            // brand-colour sparkle: gold / white / cyan
+            vec3 sparkleRGB = h3 < 0.38 ? vec3(1.2,  0.80, 0.0)   // gold
+                            : h3 < 0.72 ? vec3(1.6,  1.6,  1.6)   // white
+                            :              vec3(0.2,  0.82, 1.15);  // cyan
+
+            // --- base shading (preserved from original) ---
+            float sweepWidth    = 0.15;
             float sweepProgress = mod(uTime * 0.3, 2.0) - 0.5;
-            float sweepFactor = smoothstep(sweepProgress - sweepWidth, sweepProgress, vUv.x)
-                              * (1.0 - smoothstep(sweepProgress, sweepProgress + sweepWidth, vUv.x));
-            vec3 normal  = normalize(vNormal);
-            vec3 viewDir = normalize(vViewPosition);
+            float sweepFactor   = smoothstep(sweepProgress - sweepWidth, sweepProgress, vUv.x)
+                                * (1.0 - smoothstep(sweepProgress, sweepProgress + sweepWidth, vUv.x));
+            vec3 normal   = normalize(vNormal);
+            vec3 viewDir  = normalize(vViewPosition);
             float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
             vec3 baseColor = texColor.rgb;
             vec3 neonGlow  = vec3(0.95, 0.95, 1.0) * uGlowIntensity;
-            vec3 finalRGB  = mix(baseColor, baseColor + neonGlow + (sweepFactor * 0.4), 0.5);
-            finalRGB += vec3(fresnel * 0.3);
-            float alpha = texColor.a * (1.0 - traceEdge) * uOpacity;
+            vec3 finalRGB  = mix(baseColor, baseColor + neonGlow + sweepFactor * 0.4, 0.5);
+            finalRGB      += vec3(fresnel * 0.3);
+            finalRGB       = mix(finalRGB, sparkleRGB, clamp(sparkle * 1.2, 0.0, 1.0));
+
+            // revealed cells show texture; unrevealed cells still flash at the edge
+            float alpha = max(cellAlpha * texColor.a, sparkle * texColor.a) * uOpacity;
             gl_FragColor = vec4(finalRGB, alpha);
           }
         `
@@ -1579,7 +1767,7 @@
           const tl = gsap.timeline();
 
           // Trace out the logo
-          tl.to(customMaterial.uniforms.uTraceProgress, { value: 1.0, duration: 2.8, ease: "power3.inOut" });
+          tl.to(customMaterial.uniforms.uTraceProgress, { value: 1.15, duration: 2.8, ease: "power3.inOut" });
           // Glow burst
           tl.to(customMaterial.uniforms.uGlowIntensity,  { value: 1.4, duration: 0.6, ease: "power2.out" }, "-=0.8");
           // Settle to ambient glow
@@ -1716,7 +1904,7 @@
       setupReveal('.stat',          { stagger: 55, groupBy: 4 });
 
       setupReveal('.contact-socials');
-      setupReveal('.contact-form');
+      setupReveal('.contact .hero-enter-btn');
 
       const scrollObserver = new IntersectionObserver(entries => {
         entries.forEach(e => {
@@ -2485,6 +2673,273 @@
           pixelRatio:           Math.min(window.devicePixelRatio || 1, 2)
         });
       });
+    })();
+
+    // ============================================================
+    //  ORBITAL TIMELINE  (niches section — vanilla JS port)
+    // ============================================================
+    (function initNichesOrbital() {
+      const DATA = [
+        {
+          id: 1, title: 'VICES', icon: '🔥', energy: 95,
+          content: 'Tobacco, spirits, lifestyle brands — seductive, rebellious, and unapologetically bold visuals.',
+          relatedIds: [2, 4]
+        },
+        {
+          id: 2, title: 'EXTREME', icon: '⚡', energy: 88,
+          content: 'Skateboarding, BMX, MMA, surfing, motocross — the adrenaline is built into every design.',
+          relatedIds: [1, 3]
+        },
+        {
+          id: 3, title: 'ECOMMERCE', icon: '🛒', energy: 82,
+          content: 'Product visuals, brand systems, and packaging design that converts — great design sells.',
+          relatedIds: [2, 4]
+        },
+        {
+          id: 4, title: 'ARTISTS', icon: '🎭', energy: 78,
+          content: 'Musicians, visual artists, photographers — we build brands around your art so your audience gets it.',
+          relatedIds: [1, 3]
+        }
+      ];
+
+      const wrapper  = document.getElementById('niches-orbital');
+      const section  = document.getElementById('niches');
+      if (!wrapper) return;
+
+      let angle      = 0;
+      let autoRotate = true;
+      let activeId   = null;
+      let timer      = null;
+      let visible    = false;
+      const nodes    = {};
+
+      function radius() {
+        return Math.min(190, Math.max(110, (wrapper.clientWidth / 2) - 80));
+      }
+
+      function calcPos(idx) {
+        const a   = ((idx / DATA.length) * 360 + angle) % 360;
+        const rad = (a * Math.PI) / 180;
+        const r   = radius();
+        return {
+          x:  r * Math.cos(rad),
+          y:  r * Math.sin(rad),
+          z:  Math.round(100 + 50 * Math.cos(rad)),
+          op: Math.max(0.4, Math.min(1, 0.4 + 0.6 * ((1 + Math.sin(rad)) / 2)))
+        };
+      }
+
+      function render() {
+        const r = radius();
+        trackEl.style.width  = `${r * 2}px`;
+        trackEl.style.height = `${r * 2}px`;
+        DATA.forEach((item, idx) => {
+          const el = nodes[item.id];
+          if (!el) return;
+          const p = calcPos(idx);
+          const active = activeId === item.id;
+          el.style.transform = `translate(calc(-50% + ${p.x}px), calc(-50% + ${p.y}px))`;
+          el.style.zIndex    = active ? 200 : p.z;
+          el.style.opacity   = active ? 1   : p.op;
+        });
+      }
+
+      function startLoop() {
+        if (timer) return;
+        timer = setInterval(() => { angle = (angle + 0.3) % 360; render(); }, 50);
+      }
+
+      function stopLoop() { clearInterval(timer); timer = null; }
+
+      function closeAll() {
+        if (activeId === null) return;
+        const prev = nodes[activeId];
+        if (prev) {
+          prev.querySelector('.orbital-card').style.display = 'none';
+          prev.classList.remove('orbital-node--active');
+        }
+        DATA.forEach(d => nodes[d.id] && nodes[d.id].classList.remove('orbital-node--related', 'orbital-node--pulsing'));
+        activeId = null;
+        autoRotate = true;
+        if (visible) startLoop();
+      }
+
+      function openNode(id) {
+        closeAll();
+        activeId   = id;
+        autoRotate = false;
+        stopLoop();
+
+        const el   = nodes[id];
+        const item = DATA.find(d => d.id === id);
+        if (!el || !item) return;
+
+        // snap node to top of orbit (angle 270°) so card fits inside section
+        const idx      = DATA.findIndex(d => d.id === id);
+        const target   = 270 - (idx / DATA.length) * 360;
+        angle = ((target % 360) + 360) % 360;
+        render();
+
+        // position card above or below based on node's y position
+        const p    = calcPos(idx);
+        const card = el.querySelector('.orbital-card');
+        const line = el.querySelector('.orbital-card-line');
+        if (p.y > 20) {
+          card.style.top    = 'auto';
+          card.style.bottom = 'calc(100% + 16px)';
+          line.style.top    = 'auto';
+          line.style.bottom = '-14px';
+        } else {
+          card.style.bottom = 'auto';
+          card.style.top    = 'calc(100% + 16px)';
+          line.style.bottom = 'auto';
+          line.style.top    = '-14px';
+        }
+        card.style.display = 'block';
+
+        el.classList.add('orbital-node--active');
+        item.relatedIds.forEach(rid => {
+          const rel = nodes[rid];
+          if (rel) rel.classList.add('orbital-node--related', 'orbital-node--pulsing');
+        });
+      }
+
+      function toggleNode(id) {
+        id === activeId ? closeAll() : openNode(id);
+      }
+
+      // — Build DOM —
+      const centerEl = document.createElement('div');
+      centerEl.className = 'orbital-center';
+      centerEl.innerHTML = `<div class="orbital-ring orbital-ring--1"></div>
+                             <div class="orbital-ring orbital-ring--2"></div>
+                             <div class="orbital-core"></div>`;
+      wrapper.appendChild(centerEl);
+
+      const trackEl = document.createElement('div');
+      trackEl.className = 'orbital-track';
+      wrapper.appendChild(trackEl);
+
+      DATA.forEach(item => {
+        const relBtns = item.relatedIds.map(rid => {
+          const r = DATA.find(d => d.id === rid);
+          return r ? `<button class="orbital-card-related-btn" data-target="${rid}">${r.title} →</button>` : '';
+        }).join('');
+
+        const el = document.createElement('div');
+        el.className = 'orbital-node';
+        el.setAttribute('aria-label', item.title);
+        el.innerHTML = `
+          <div class="orbital-node-energy" style="width:${item.energy * 0.38 + 28}px;height:${item.energy * 0.38 + 28}px;"></div>
+          <div class="orbital-node-btn">${item.icon}</div>
+          <div class="orbital-node-label">${item.title}</div>
+          <div class="orbital-card" style="display:none;">
+            <div class="orbital-card-line"></div>
+            <div class="orbital-card-content">
+              <p class="orbital-card-title">${item.title}</p>
+              <p class="orbital-card-desc">${item.content}</p>
+              <div class="orbital-card-energy">
+                <div class="orbital-card-energy-label"><span>⚡ Energy</span><span>${item.energy}%</span></div>
+                <div class="orbital-card-energy-bar">
+                  <div class="orbital-card-energy-fill" style="width:${item.energy}%"></div>
+                </div>
+              </div>
+              ${relBtns ? `<div class="orbital-card-related">
+                <p class="orbital-card-related-label">Connected Niches</p>
+                <div class="orbital-card-related-btns">${relBtns}</div>
+              </div>` : ''}
+            </div>
+          </div>`;
+
+        el.addEventListener('click', e => { e.stopPropagation(); toggleNode(item.id); });
+        nodes[item.id] = el;
+        wrapper.appendChild(el);
+      });
+
+      // related-button delegation
+      wrapper.addEventListener('click', e => {
+        const btn = e.target.closest('.orbital-card-related-btn');
+        if (btn) { e.stopPropagation(); toggleNode(+btn.dataset.target); }
+      });
+
+      // click backdrop to dismiss
+      section && section.addEventListener('click', e => {
+        if (!e.target.closest('.orbital-node') && activeId !== null) closeAll();
+      });
+
+      // pause when scrolled off-screen
+      new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible && autoRotate) startLoop(); else if (!visible) stopLoop();
+      }, { threshold: 0 }).observe(wrapper);
+
+      // recompute track ring on resize
+      new ResizeObserver(render).observe(wrapper);
+
+      render();
+    })();
+
+    // ============================================================
+    //  FEATURED VIDEO — YouTube IFrame API mute toggle
+    // ============================================================
+    (function initFeaturedVideo() {
+      var ytPlayer  = null;
+      var isMuted   = true;
+      var muteBtn   = document.getElementById('work-mute-btn');
+      var iconOff   = muteBtn && muteBtn.querySelector('.mute-icon--off');
+      var iconOn    = muteBtn && muteBtn.querySelector('.mute-icon--on');
+
+      function applyMuteUI() {
+        if (!muteBtn) return;
+        iconOff.style.display = isMuted ? '' : 'none';
+        iconOn.style.display  = isMuted ? 'none' : '';
+      }
+
+      function onPlayerReady(e) {
+        e.target.mute();
+        e.target.playVideo();
+        isMuted = true;
+        applyMuteUI();
+      }
+
+      function createPlayer() {
+        ytPlayer = new YT.Player('featured-yt', {
+          events: { onReady: onPlayerReady }
+        });
+      }
+
+      // Load YT API (guards against double-load from other scripts)
+      if (!document.getElementById('yt-iframe-api')) {
+        var tag = document.createElement('script');
+        tag.id  = 'yt-iframe-api';
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+      }
+
+      // When API ready: if called before our IIFE, store a chained callback
+      var prevCallback = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = function() {
+        if (typeof prevCallback === 'function') prevCallback();
+        createPlayer();
+      };
+      // If API already loaded synchronously
+      if (window.YT && window.YT.Player) createPlayer();
+
+      // Mute / unmute toggle
+      if (muteBtn) {
+        muteBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (!ytPlayer || typeof ytPlayer.mute !== 'function') return;
+          if (isMuted) {
+            ytPlayer.unMute();
+            ytPlayer.setVolume(70);
+          } else {
+            ytPlayer.mute();
+          }
+          isMuted = !isMuted;
+          applyMuteUI();
+        });
+      }
     })();
 
   </script>
